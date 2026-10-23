@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { AppModule } from './app.module';
@@ -21,4 +22,5 @@ export function uniqueEmail(prefix = 'user'): string {
   return `${prefix}-${Date.now()}-${counter}-${Math.random().toString(36).slice(2, 8)}@example.com`;
 }
 
-export const PASSWORD = 'correct-horse-battery';
+// Generated per test run so no credential is committed to the repository (8-72 characters).
+export const PASSWORD = `Pw-${randomBytes(16).toString('hex')}`;
