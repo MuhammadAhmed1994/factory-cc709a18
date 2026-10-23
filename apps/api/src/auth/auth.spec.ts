@@ -38,12 +38,13 @@ describe('Auth API', () => {
   });
 
   it('[AC-2] register with malformed email or missing/short password returns 400 and creates nothing', async () => {
-    const before = await prisma.user.count();
     const http = app.getHttpServer();
+    const noPassword = uniqueEmail('nopw');
+    const shortPassword = uniqueEmail('short');
     await request(http).post('/auth/register').send({ email: 'not-an-email', password: PASSWORD }).expect(400);
-    await request(http).post('/auth/register').send({ email: uniqueEmail() }).expect(400);
-    await request(http).post('/auth/register').send({ email: uniqueEmail(), password: 'short' }).expect(400);
-    expect(await prisma.user.count()).toBe(before);
+    await request(http).post('/auth/register').send({ email: noPassword }).expect(400);
+    await request(http).post('/auth/register').send({ email: shortPassword, password: 'short' }).expect(400);
+    expect(await prisma.user.count({ where: { email: { in: [noPassword, shortPassword, 'not-an-email'] } } })).toBe(0);
   });
 
   it('[AC-3] login with correct credentials returns 200 and sets an httpOnly session cookie', async () => {

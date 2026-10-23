@@ -2,12 +2,14 @@
   "name": "api",
   "private": true,
   "scripts": {
-    "build": "nest build",
+    "postinstall": "prisma generate",
+    "prisma:generate": "prisma generate",
+    "build": "prisma generate && nest build",
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main.js",
-    "test": "jest --passWithNoTests",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "test": "prisma generate && prisma migrate deploy && jest --passWithNoTests",
+    "typecheck": "prisma generate && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

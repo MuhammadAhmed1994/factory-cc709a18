@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiCookieAuth, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiErrors } from '../common/api-errors.decorator';
 import { AuthUser, CurrentUser } from '../common/current-user.decorator';
 import { SummaryDto, SummaryService } from './summary.service';
 
@@ -12,6 +13,7 @@ export class SummaryController {
   @Get()
   @ApiQuery({ name: 'month', example: '2026-10' })
   @ApiOkResponse({ type: SummaryDto })
+  @ApiErrors(400, 401)
   get(@CurrentUser() user: AuthUser, @Query('month') month?: string): Promise<SummaryDto> {
     return this.summary.summarize(user.id, month);
   }
