@@ -1,17 +1,24 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
+import { ToastProvider } from '../components/toast'
 import './globals.css'
 
-// Written by the factory. The web foundation task may change the metadata, fonts and shell.
 export const metadata: Metadata = {
-  title: 'App',
-  description: 'Built by the AI factory.',
+  title: 'Personal Expense Tracker',
+  description: 'Record, categorize and summarize your daily expenses.',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   )
 }
