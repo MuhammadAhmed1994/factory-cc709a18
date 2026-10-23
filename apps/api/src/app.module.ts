@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
+import { PrismaModule } from './prisma/prisma.module';
 
-// Written by the factory. The wiring task registers every feature module here.
+// Feature modules are registered here.
 @Module({
-  imports: [],
+  imports: [PrismaModule],
 })
 export class AppModule {}

@@ -1,5 +1,7 @@
 import { randomBytes } from 'node:crypto';
-import { INestApplication, Logger, UnprocessableEntityException, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 
 // Written by the factory: the one place the api reads its environment. No .env file is loaded and
 // no secret or host is hard-coded: production must set what it needs and fails at boot if it doesn't;
@@ -47,6 +49,12 @@ export const config = {
   get port(): number {
     return Number(fromEnv('PORT') ?? 3001);
   },
+  get cookieSecure(): boolean {
+    return isProduction();
+  },
+  get allowedOrigins(): string[] | true {
+    return corsOrigins();
+  },
   get jwtSecret(): string {
     return secret('JWT_SECRET');
   },
@@ -57,6 +65,7 @@ export const config = {
 // its first request.
 export function configureApp(app: INestApplication): void {
   void config.jwtSecret;
+  app.use(cookieParser());
   app.enableCors({ origin: corsOrigins(), credentials: true });
   // whitelist/forbidNonWhitelisted reject unknown fields; use the status the Spec requires (often 422).
   app.useGlobalPipes(
@@ -64,7 +73,12 @@ export function configureApp(app: INestApplication): void {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-      exceptionFactory: (errors) => new UnprocessableEntityException(errors),
+      exceptionFactory: (errors) => new BadRequestException(errors),
     }),
   );
+  const document = SwaggerModule.createDocument(
+    app,
+    new DocumentBuilder().setTitle('Personal Expense Tracker API').setVersion('1.0').addCookieAuth('session').build(),
+  );
+  SwaggerModule.setup('docs', app, document, { jsonDocumentUrl: 'openapi.json' });
 }
